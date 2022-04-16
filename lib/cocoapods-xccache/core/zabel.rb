@@ -109,34 +109,6 @@ module Zabel
             puts "[ZABEL/I] skip #{target.name}"
             return false
         end
-
-        #############################################
-        #TODO: 待优化 啦啦啦啦
-        #
-        # if $has_load_cache_file == false
-        #     $has_load_cache_file = true
-        #     cache_file_path = Dir.pwd + "/" + FILE_NAME_CACHE
-        #     if File.exist? cache_file_path
-        #         puts "[ZABEL/I] 手动配置的Podfile缓存信息存在"
-        #         $cache_hash = YAML.load_file(File.read(cache_file_path))
-        #         puts("podfile 参数设置 = #{$cache_hash}")
-        #     else
-        #         puts "[ZABEL/I] 手动配置的Podfile缓存信息不存在 path: #{cache_file_path}"
-        #     end
-        # end
-
-        # 含有资源的库会有多个target,过滤的时候一起过滤
-        # split_parts = target.name.split("-")
-        # target_name = split_parts[0]
-        # if $cache_hash.has_key? target_name
-        #     if $cache_hash[target_name] == false
-        #         puts "[ZABEL/I] skip #{target.name} because of Podfile setting"
-        #         return false
-        #     end
-        # end
-
-        #########################################
-
         if target.class == Xcodeproj::Project::Object::PBXNativeTarget
             # see https://github.com/CocoaPods/Xcodeproj/blob/master/lib/xcodeproj/constants.rb#L145
             if target.product_type == "com.apple.product-type.bundle" or 
