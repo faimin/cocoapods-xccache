@@ -1038,9 +1038,10 @@ module Zabel
     def self.zd_inject_main_target_shell
         project, target = zd_get_main_project_and_target
 
-        inject_phase = target.new_shell_script_build_phase("zabel_extract_#{target.name}")
+        inject_phase = target.new_shell_script_build_phase("zabel_xccache_#{target.name}")
         inject_phase.shell_path = "/usr/bin/env bash -l"
         inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xccache"
+        inject_phase.run_only_for_deployment_postprocessing = "1"
         inject_phase.show_env_vars_in_log = '1'
 
         project.save
