@@ -32,7 +32,7 @@ module Pod
   
         def initialize(argv)
           @targetcachedir = argv.shift_argument
-          UI.print "[ZABEL/I] extract target_cache_dir => #{@targetcachedir}"
+          UI.print "[XCCACHE/I] extract target_cache_dir => #{@targetcachedir}"
           super
         end
   
@@ -42,7 +42,7 @@ module Pod
         end
   
         def run
-          UI.puts "[ZABEL/I] 开始执行 extract 函数"
+          UI.puts "[XCCACHE/I] 开始执行 extract 函数"
           Zabel.zabel_extract(@targetcachedir)
         end
       end

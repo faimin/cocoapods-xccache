@@ -52,7 +52,7 @@ module Pod
       end
 
       def run
-        UI.puts "[ZABEL/I] 开始执行pod xccache 流程:"
+        UI.puts "[XCCACHE/I] 开始执行pod xccache 流程:"
         Zabel.zabel_post({})
       end
     end

@@ -51,7 +51,7 @@ module Pod
         end
   
         def run
-          UI.puts "[ZABEL/I] 执行 printEnv"
+          UI.puts "[XCCACHE/I] 执行 printEnv"
           Zabel.zabel_printenv(@target_name, @project_path)
         end
       end
