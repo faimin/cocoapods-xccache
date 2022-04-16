@@ -1,11 +1,17 @@
 # cocoapods-xccache
 
-A description of cocoapods-xccache.
+A CocoaPods plugin which cache pods with [zabel](https://github.com/WeijunDeng/Zabel) to speed compile.
 
 ## Installation
 
-    $ gem install cocoapods-xccache
+```shell
+$ gem install cocoapods-xccache
+```
 
 ## Usage
 
-    $ pod spec xccache POD_NAME
+add the `plugin` to `Podfile`.
+
+```ruby
+plugin 'cocoapods-xccache'
+```
