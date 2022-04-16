@@ -752,7 +752,7 @@ module Zabel
 
         inject_phase = target.new_shell_script_build_phase("zabel_extract_#{target.name}")
         inject_phase.shell_path = "/usr/bin/env bash -l"
-        inject_phase.shell_script = "pod xcextract #{target_cache_dir}"
+        inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xcextract #{target_cache_dir}"
         inject_phase.show_env_vars_in_log = '1'
 
         puts "成功注入pod extract 脚本"
@@ -770,7 +770,7 @@ module Zabel
         # inject_phase = target.new_shell_script_build_phase("zabel_printenv_#{target.name}")
         # inject_phase.shell_script = "#{zabel_exec} #{STAGE_PRINTENV} #{target.name} \"#{project.path}\""
 
-        zabel_exec = "pod xcprintenv --targetname=#{target.name} --projectpath=#{project.path}"
+        zabel_exec = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xcprintenv --targetname=#{target.name} --projectpath=#{project.path}"
         inject_phase = target.new_shell_script_build_phase("zabel_printenv_#{target.name}")
         inject_phase.shell_path = "/usr/bin/env bash -l"
         inject_phase.shell_script = zabel_exec
@@ -1062,12 +1062,12 @@ module Zabel
 
         inject_phase = target.new_shell_script_build_phase("zabel_extract_#{target.name}")
         inject_phase.shell_path = "/usr/bin/env bash -l"
-        inject_phase.shell_script = "pod xccache"
+        inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xccache"
         inject_phase.show_env_vars_in_log = '1'
 
         project.save
 
-        puts "[ZABEL/I] 插入主工程生产脚本"
+        puts "[ZABEL/I] 在主target中注入 XCCache 脚本"
     end
 
     # 删除主工程注入的脚本
