@@ -34,8 +34,8 @@ module Zabel
     FILE_NAME_PRODUCT = "product.tar"
     FILE_NAME_TARGET_CONTEXT = "zabel_target_context.yml"
 
-    FILE_NAME_CACHE = "pod_cache.txt"
-    PRE_SHELL_NAME = "xccache_pre"
+    #FILE_NAME_CACHE = "pod_cache.txt"
+    #PRE_SHELL_NAME = "xccache_pre"
     
     def self.zabel_get_cache_root
         cache_root = ENV["ZABEL_CACHE_ROOT"]
@@ -743,7 +743,6 @@ module Zabel
             build_phase.class == Xcodeproj::Project::Object::PBXResourcesBuildPhase
         }
 
-        # MARK: 修改
         # zabel_exec = "\"#{$0}\""
         # if ENV["BUNDLE_BIN_PATH"] and ENV["BUNDLE_BIN_PATH"].size > 0 and ENV["BUNDLE_GEMFILE"] and ENV["BUNDLE_GEMFILE"].size > 0
         #     zabel_exec = "cd \"#{File.dirname(ENV["BUNDLE_GEMFILE"])}\" && \"#{ENV["BUNDLE_BIN_PATH"]}\" exe zabel"
@@ -759,8 +758,6 @@ module Zabel
     end
 
     #####################################################################
-
-    # MARK: 原函数魔改
 
     def self.zabel_inject_printenv(project, target)
         # zabel_exec = "\"#{$0}\""
@@ -940,7 +937,6 @@ module Zabel
     
     def self.zabel_extract(target_cache_dir)
         puts "[ZABEL/D] #{Time.now.to_f.to_s}"
-        start_time = Time.now
 
         #target_cache_dir = ARGV[1]
         
@@ -1009,7 +1005,7 @@ module Zabel
 
     ################### 新加函数 ####################
 
-    # 获取主工程
+    # 获取主工程 和 主target
     def self.zd_get_main_project_and_target
         main_xcodeproj_path_arry = Dir.glob("*.xcodeproj")
         if main_xcodeproj_path_arry.size == 0
@@ -1038,24 +1034,6 @@ module Zabel
         return main_project, main_target
     end
 
-    # 获取主工程的目标target
-    # def self.zd_get_main_target(main_project, main_project_name)
-    #     main_target = nil
-    #
-    #     main_project.native_targets.each do | target |
-    #         if target.name == main_project_name
-    #             main_target = target
-    #             break
-    #         end
-    #     end
-    #
-    #     unless main_target
-    #         puts "[ZABEL/E 未找到 target]"
-    #     end
-    #
-    #     return main_target
-    # end
-
     # 在主工程中注入脚本
     def self.zd_inject_main_target_shell
         project, target = zd_get_main_project_and_target
@@ -1071,11 +1049,15 @@ module Zabel
     end
 
     # 删除主工程注入的脚本
-    def self.zd_delete_main_target_shell(project, target)
+    def self.zd_delete_main_target_shell
+        project, target = zd_get_main_project_and_target
+        main_target_shell_name = "zabel_extract_#{target_name}"
+
         target.build_phases.delete_if { | build_phase |
-            build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == PRE_SHELL_NAME
+            build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == main_target_shell_name
         }
         project.save
-        puts "[ZABEL/I] 删除主工程Pre脚本"
+
+        puts "[ZABEL/I] 删除主 target 脚本"
     end
 end
