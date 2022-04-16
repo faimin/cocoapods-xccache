@@ -43,7 +43,7 @@ module Zabel
             return cache_root
         end
     
-        return Dir.home + "/zabel"
+        return Dir.home + "/xccache"
     end
     
     def self.zabel_get_cache_count
