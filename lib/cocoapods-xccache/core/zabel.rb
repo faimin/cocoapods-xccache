@@ -36,6 +36,7 @@ module Zabel
 
     #FILE_NAME_CACHE = "pod_cache.txt"
     #PRE_SHELL_NAME = "xccache_pre"
+    MAIN_PROJECT_SHELL_NAME = "zable_xccache"
     
     def self.zabel_get_cache_root
         cache_root = ENV["ZABEL_CACHE_ROOT"]
@@ -1038,7 +1039,7 @@ module Zabel
     def self.zd_inject_main_target_shell
         project, target = zd_get_main_project_and_target
 
-        inject_phase = target.new_shell_script_build_phase("zabel_xccache_#{target.name}")
+        inject_phase = target.new_shell_script_build_phase("#{MAIN_PROJECT_SHELL_NAME}_#{target.name}")
         inject_phase.shell_path = "/usr/bin/env bash -l"
         inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xccache"
         inject_phase.run_only_for_deployment_postprocessing = "1"
@@ -1052,7 +1053,7 @@ module Zabel
     # 删除主工程注入的脚本
     def self.zd_delete_main_target_shell
         project, target = zd_get_main_project_and_target
-        main_target_shell_name = "zabel_extract_#{target_name}"
+        main_target_shell_name = "#{MAIN_PROJECT_SHELL_NAME}_#{target_name}"
 
         target.build_phases.delete_if { | build_phase |
             build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == main_target_shell_name
