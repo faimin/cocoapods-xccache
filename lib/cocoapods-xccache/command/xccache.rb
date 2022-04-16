@@ -18,26 +18,42 @@ module Pod
     #       in the `plugins.json` file, once your plugin is released.
     #
     class Xccache < Command
-      self.summary = 'Short description of cocoapods-xccache.'
+      self.summary = '基于Xcode cache的缓存插件之缓存'
+
+      # 参数设置 https://juejin.cn/post/7005979638904127518
 
       self.description = <<-DESC
-        Longer description of cocoapods-xccache.
+        一个CocoaPods插件，基于对zabel的封装
       DESC
 
-      self.arguments = 'NAME'
+      self.arguments = [
+        #CLAide::Argument.new('update',true)
+      ]
+
+      # 可选参数
+      def self.options 
+        [
+          ['--update', 'need exec pod update'],
+          ['--install', 'need exec pod install']
+        ].concat(super)
+      end
 
       def initialize(argv)
-        @name = argv.shift_argument
+        #puts "xccache 初始化参数 #{argv.to_s}"
+        #@name = argv.shift_argument
+        @update = argv.flag?("update")
+        @install = argv.flag?("install")
         super
       end
 
       def validate!
         super
-        help! 'A Pod name is required.' unless @name
+        #help! 'A Pod name is required.' unless @name
       end
 
       def run
-        UI.puts "Add your implementation for the cocoapods-xccache plugin in #{__FILE__}"
+        UI.puts "[ZABEL/I] 开始执行pod xccache 流程:"
+        Zabel.zabel_post({})
       end
     end
   end

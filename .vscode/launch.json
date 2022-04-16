@@ -1,0 +1,34 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Ruby Code",
+            // 输出调试信息
+            "showDebuggerOutput": true,
+            // 告诉VS Code要运行什么调试器。
+            "type": "Ruby",
+            // "launch"允许直接从VS Code启动提供的程序-或"attach"-允许您附加到远程调试会话。
+            "request": "launch",
+            // rdebug-ide在内运行bundler exec 将Gemfile里面引用的库加到工程中
+            "useBundler": true,
+            // 始终在入口处停止
+            "stopOnEntry": false,
+            // "program"的工作目录
+            // cwd代表运行的目录，必须和gemfile一个目录。${workspaceRoot}指的是VSCode工程的目录
+            "cwd": "${workspaceRoot}",
+            // 指定调试脚本，调试当前打开的文件"program": "${file}" 就是哪个程序
+            // "program": "~/Work/CocoaPods/bin/pod",//这里指明的是cocoapods源码里面的bin目录下的pod
+            // "program": "${file}",
+            "program": "~/.rvm/gems/ruby-2.7.4/bin/pod",
+            // 提供program命令参数
+            "args": [
+                //"install", //这里指明是pod程序的参数 install
+                //"verbose" // 其他参数
+                "xccache", "--update"
+            ],
+        }
+    ]
+}

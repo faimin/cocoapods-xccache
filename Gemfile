@@ -10,4 +10,9 @@ group :development do
   gem 'bacon'
   gem 'mocha-on-bacon'
   gem 'prettybacon'
+
+  gem 'bundle'
+
+  gem 'ruby-debug-ide' 
+  gem 'debase'
 end
