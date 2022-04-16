@@ -633,7 +633,8 @@ module Zabel
                 end
             end
         end
-    
+
+        puts "[XCCACHE/I] 恢复"
         projects.each do | project |
             zabel_restore_project(project)
         end
@@ -643,7 +644,8 @@ module Zabel
         puts "[XCCACHE/I] total add #{add_count}"
     
         puts "[XCCACHE/I] duration = #{(Time.now - start_time).to_i} s in stage post"
-    
+
+        #zd_delete_main_target_shell
     end
     
     def self.zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list)
@@ -1011,19 +1013,29 @@ module Zabel
     def self.zd_inject_main_target_shell
         project, target = zd_get_main_project_and_target
 
-        inject_phase = target.new_shell_script_build_phase("#{MAIN_PROJECT_SHELL_NAME}_#{target.name}")
-        inject_phase.shell_path = "/usr/bin/env bash -l"
-        inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xccache"
-        inject_phase.run_only_for_deployment_postprocessing = "1"
-        inject_phase.show_env_vars_in_log = '1'
+        main_target_shell_name = "#{MAIN_PROJECT_SHELL_NAME}_#{target.name}"
 
+        targetIndex = target.build_phases.index { |build_phase|
+            build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == main_target_shell_name
+        }
+
+        if targetIndex.nil?
+            inject_phase = target.new_shell_script_build_phase("#{MAIN_PROJECT_SHELL_NAME}_#{target.name}")
+            inject_phase.shell_path = "/usr/bin/env bash -l"
+            inject_phase.shell_script = "export LC_ALL=en_US.UTF-8 \nexport LANG=en_US.UTF-8 \n\npod xccache"
+            #inject_phase.run_only_for_deployment_postprocessing = "1"
+            inject_phase.show_env_vars_in_log = '1'
+
+            puts "[XCCACHE/I] 在主target中注入 XCCache 脚本"
+        else
+            puts "[XCCACHE/I] 主target中已存在 XCCache 脚本"
+        end
         project.save
-
-        puts "[XCCACHE/I] 在主target中注入 XCCache 脚本"
     end
 
     # 删除主工程注入的脚本
     def self.zd_delete_main_target_shell
+        puts "[XCCACHE/I] 删除主工程注入的脚本"
         project, target = zd_get_main_project_and_target
         main_target_shell_name = "#{MAIN_PROJECT_SHELL_NAME}_#{target_name}"
 
@@ -1031,7 +1043,5 @@ module Zabel
             build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == main_target_shell_name
         }
         project.save
-
-        puts "[XCCACHE/I] 删除主 target 脚本"
     end
 end
