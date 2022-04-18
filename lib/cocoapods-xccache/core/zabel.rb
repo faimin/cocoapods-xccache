@@ -466,9 +466,7 @@ module Zabel
     
     def self.zabel_post(argv)
 
-        if argv.nil?
-            argv = {}
-        end
+        argv ||= {}
 
         # configuration_name = nil
         configuration_name = "Debug"
@@ -751,9 +749,7 @@ module Zabel
 
     def self.zabel_pre(argv)
 
-        if argv.nil?
-            argv = {}
-        end
+        argv ||= {}
 
         # configuration_name = nil
         configuration_name = "Debug"
