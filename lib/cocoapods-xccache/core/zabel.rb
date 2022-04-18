@@ -6,6 +6,8 @@ require "find"
 require 'yaml'
 require 'pathname'
 
+require_relative 'private_api_hooks'
+
 module Zabel
     class Error < StandardError; end
 
