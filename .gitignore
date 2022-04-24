@@ -56,3 +56,4 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 ./test/PluginDebug/Pods
+./test/Pods
