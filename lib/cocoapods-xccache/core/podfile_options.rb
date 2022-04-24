@@ -3,12 +3,16 @@ module Pod
         module DSL
             
             private
-            class_attr_accessor :cache_all
-            cache_all = false
+            #attr_accessor :cache_all
+            @@cache_all = true
+
+            def self.cache_all
+                return @@cache_all
+            end
 
             # Enable cache for all pods
             # it has a lower priority to other cache settings
-            def all_cache!
+            def cache_all!
                 DSL.cache_all = true
             end
 
