@@ -13,7 +13,7 @@ module Pod
             # Enable cache for all pods
             # it has a lower priority to other cache settings
             def cache_all!
-                DSL.cache_all = true
+                @@cache_all = true
             end
 
         end
