@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'https://gems.ruby-china.com/'
 
 # Specify your gem's dependencies in cocoapods-xccache.gemspec
 gemspec
@@ -10,8 +10,6 @@ group :development do
   gem 'bacon'
   gem 'mocha-on-bacon'
   gem 'prettybacon'
-
-  gem 'bundle'
 
   gem 'ruby-debug-ide' 
   gem 'debase'
