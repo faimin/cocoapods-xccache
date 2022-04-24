@@ -14,6 +14,13 @@ module Pod
 
     class Podfile
         class TargetDefinition
+
+            @@ignore_pod_names = Set.new
+
+            def self.ignore_pod_names
+                @@ignore_pod_names
+            end
+
             def parse_xccache_option(name, requirements)
                 should_cache = Pod::Podfile::DSL.cache_all
 
@@ -25,9 +32,8 @@ module Pod
         
                 pod_name = Specification.root_name(name)
                 
-                if should_cache == true
-                    @cache_pod_names ||= []
-                    @cache_pod_names.push pod_name
+                if should_cache == false
+                    @@ignore_pod_names.add(pod_name)
                 end
             end
 
@@ -48,41 +54,50 @@ end
 
 
 module Pod
+    class Target
+        attr_accessor :user_define_whether_cache
+    end
+
     class Installer
 
-        def cache_pod_targets
-            @cache_pod_targets ||= (
-            all = []
-
-            aggregate_targets = self.aggregate_targets
-            aggregate_targets.each do |aggregate_target|
-                target_definition = aggregate_target.target_definition
-                targets = aggregate_target.pod_targets || []
-
-                # filter prebuild
-                prebuild_names = target_definition.prebuild_framework_pod_names
-                if not Podfile::DSL.prebuild_all
-                    targets = targets.select { |pod_target| prebuild_names.include?(pod_target.pod_name) } 
+        def resolve_all_pod_cache(pod_targets)
+            root_pod_cache_options = Pod::Podfile::TargetDefinition.ignore_pod_names.clone
+            pod_targets.each do |target|
+                # next if not root_pod_cache_options.include?(target.name)
+        
+                notCache = root_pod_cache_options.include?(target.name)
+                dependencies = target.dependent_targets
+        
+                # Cascade build_type down
+                while not dependencies.empty?
+                    new_dependencies = []
+                    dependencies.each do |dep_target|
+                        dep_target.user_define_whether_cache = (not notCache)
+                        new_dependencies.push(*dep_target.dependent_targets)
+                    end
+                    dependencies = new_dependencies
                 end
-                dependency_targets = targets.map {|t| t.recursive_dependent_targets }.flatten.uniq || []
-                targets = (targets + dependency_targets).uniq
-
-                # filter should not prebuild
-                explict_should_not_names = target_definition.should_not_prebuild_framework_pod_names
-                targets = targets.reject { |pod_target| explict_should_not_names.include?(pod_target.pod_name) } 
-
-                all += targets
+        
+                target.user_define_whether_cache = (not notCache)
             end
-
-            all = all.reject {|pod_target| sandbox.local?(pod_target.pod_name) }
-            all.uniq
-            )
         end
 
-        # the root names who needs cache, including dependency pods.
-        def cache_pod_names 
-           @cache_pod_names ||= self.cache_pod_targets.map(&:pod_name)
-        end
+        # ======================
+        # ==== PATCH METHOD ====
+        # ======================
+        swizzled_analyze = instance_method(:analyze)
 
+        define_method(:analyze) do |analyzer = create_analyzer|
+            # Call origin Method
+            swizzled_analyze.bind(self).(analyzer)
+
+            resolve_all_pod_cache(pod_targets)
+
+            cache_hash = {}
+            pod_targets.each do | target |
+                cache_hash[target.name] = target.user_define_whether_cache
+            end
+            File.write(Zabel.zd_cache_file_path, cache_hash.to_yaml)
+        end
     end
 end
