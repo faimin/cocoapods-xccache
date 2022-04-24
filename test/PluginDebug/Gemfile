@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://gems.ruby-china.com/"
+
+
+gem 'cocoapods'#, :path => '../CocoaPods/'
+gem 'cocoapods-xccache', :path => '../../'
+
+gem 'ruby-debug-ide'
+gem 'debase'
