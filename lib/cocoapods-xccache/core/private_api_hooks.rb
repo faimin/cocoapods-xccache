@@ -1,6 +1,8 @@
 require_relative "podfile_options"
 
 # https://github.com/joncardasis/cocoapods-user-defined-build-types/blob/e34a802bb135ed3549f2b79ac0ac146c645106a7/lib/cocoapods-user-defined-build-types/private_api_hooks.rb
+#
+# https://github.com/leavez/cocoapods-binary/blob/b22bd948a3168a323b1ffa61095468f2c91c1cee/lib/cocoapods-binary/helper/podfile_options.rb
 
 module Pod
     
@@ -13,7 +15,7 @@ module Pod
     class Podfile
         class TargetDefinition
             def parse_xccache_option(name, requirements)
-                should_cache_all = Pod::Podfile::DSL.cache_all
+                should_cache = Pod::Podfile::DSL.cache_all
 
                 options = requirements.last
                 if options.is_a?(Hash) && options[Pod::CacheOption.keyword] != nil 
