@@ -21,7 +21,7 @@
             "program": "~/.rvm/gems/ruby-2.7.4/bin/pod",
             // 提供program命令参数
             "args": [
-                "xccache"
+                "install"
             ],
         }
     ]

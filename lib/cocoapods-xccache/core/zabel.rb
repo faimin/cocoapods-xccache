@@ -36,6 +36,8 @@ module Zabel
     FILE_NAME_PRODUCT = "product.tar"
     FILE_NAME_TARGET_CONTEXT = "zabel_target_context.yml"
 
+    FILE_IGNORE_NAME_CACHE = "ignore_pod_names_cache.text"
+
     #FILE_NAME_CACHE = "pod_cache.txt"
     #PRE_SHELL_NAME = "xccache_pre"
     MAIN_PROJECT_SHELL_NAME = "zable_xccache"
@@ -111,6 +113,26 @@ module Zabel
             puts "[XCCACHE/I] skip #{target.name}"
             return false
         end
+
+        if not $cache_hash 
+            cache_file_path = zd_cache_file_path
+            if File.exist? cache_file_path
+                puts "[XCCACHE/I] 用户设置的配置缓存存在 #{cache_file_path}"
+                $cache_hash = YAML.load(File.read(cache_file_path))
+            else
+                puts "[XCCACHE/E] 用户设置的配置缓存不存在 #{cache_file_path}"
+            end
+            $cache_hash ||= {}
+        end
+        # 含有资源的库会有多个target,过滤的时候一起过滤
+        split_parts = target.name.split("-")
+        target_name = (split_parts[0] unless split_parts.empty?)
+        target_name ||= ""
+        if $cache_hash[target_name] == false
+            puts "[XCCACHE/I] skip #{target.name} because of user setting in Podfile"
+            return false
+        end
+
         if target.class == Xcodeproj::Project::Object::PBXNativeTarget
             # see https://github.com/CocoaPods/Xcodeproj/blob/master/lib/xcodeproj/constants.rb#L145
             if target.product_type == "com.apple.product-type.bundle" or 
@@ -791,31 +813,33 @@ module Zabel
                 next
             end
             project.native_targets.each do | target |
-                if zabel_can_cache_target(target)
-                    source_files = zabel_get_target_source_files(target)
-                    unless source_files.size >= zabel_get_min_source_file_count
-                        puts "[XCCACHE/I] skip #{target.name} #{source_files.size} < #{zabel_get_min_source_file_count}"
-                        next
-                    end
-                    target_md5_content = zabel_get_target_md5_content(project, target, configuration_name, argv, source_files)
-                    target_md5 = Digest::MD5.hexdigest(target_md5_content)
-                    miss_dependency_list = []
-                    potential_hit_target_cache_dirs = zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list) 
-    
-                    target_context = {}
-                    target_context[:target_md5] = target_md5
-                    target_context[:potential_hit_target_cache_dirs] = potential_hit_target_cache_dirs
-                    target_context[:miss_dependency_list] = miss_dependency_list
-                    if potential_hit_target_cache_dirs.size == 0
-                        if miss_dependency_list.size > 0
-                            puts miss_dependency_list.uniq.join("\n")
-                        end
-                        puts "[XCCACHE/I] miss #{target.name} #{target_md5} in iteration #{iteration_count}"
-                        target_context[:target_status] = STATUS_MISS
-                        miss_count = miss_count + 1
-                    end
-                    pre_targets_context[target] = target_context
+                next unless zabel_can_cache_target(target)
+                
+                source_files = zabel_get_target_source_files(target)
+                unless source_files.size >= zabel_get_min_source_file_count
+                    puts "[XCCACHE/I] skip #{target.name} #{source_files.size} < #{zabel_get_min_source_file_count}"
+                    next
                 end
+                target_md5_content = zabel_get_target_md5_content(project, target, configuration_name, argv, source_files)
+                target_md5 = Digest::MD5.hexdigest(target_md5_content)
+                miss_dependency_list = []
+                potential_hit_target_cache_dirs = zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list) 
+                    potential_hit_target_cache_dirs = zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list) 
+                potential_hit_target_cache_dirs = zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list) 
+
+                target_context = {}
+                target_context[:target_md5] = target_md5
+                target_context[:potential_hit_target_cache_dirs] = potential_hit_target_cache_dirs
+                target_context[:miss_dependency_list] = miss_dependency_list
+                if potential_hit_target_cache_dirs.size == 0
+                    if miss_dependency_list.size > 0
+                        puts miss_dependency_list.uniq.join("\n")
+                    end
+                    puts "[XCCACHE/I] miss #{target.name} #{target_md5} in iteration #{iteration_count}"
+                    target_context[:target_status] = STATUS_MISS
+                    miss_count = miss_count + 1
+                end
+                pre_targets_context[target] = target_context
             end
         end
     
@@ -1041,5 +1065,11 @@ module Zabel
             build_phase.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase and build_phase.name == main_target_shell_name
         }
         project.save
+    end
+
+    # 是否做缓存处理的pod记录
+    def self.zd_cache_file_path
+        cache_file_path = Dir.pwd + "/" + FILE_IGNORE_NAME_CACHE
+        return cache_file_path
     end
 end

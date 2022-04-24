@@ -6,9 +6,10 @@ plugin 'cocoapods-xccache'
 target 'PluginDebug' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
+  cache_all!
 
   # Pods for PluginDebug
-  pod 'SDWebImage'
+  pod 'SDWebImage', :cache => false
   pod 'AFNetworking'
   pod 'YYModel'
 
