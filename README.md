@@ -22,5 +22,7 @@ plugin 'cocoapods-xccache'
 
 - [使用 VSCode debug CocoaPods 源码和插件](https://github.com/X140Yu/debug_cocoapods_plugins_in_vscode)
 
+- [cocoapods-localpodbinary](https://github.com/wing3501/cocoapods-localpodbinary)
+
 - [cocoapods-binary](https://github.com/leavez/cocoapods-binary)
 
