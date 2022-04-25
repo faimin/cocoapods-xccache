@@ -13,4 +13,6 @@ group :development do
 
   gem 'ruby-debug-ide' 
   gem 'debase'
+
+  gem "rake", ">= 12.3.3"
 end
