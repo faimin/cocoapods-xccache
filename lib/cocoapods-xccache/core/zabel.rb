@@ -668,6 +668,8 @@ module Zabel
         puts "[XCCACHE/I] duration = #{(Time.now - start_time).to_i} s in stage post"
 
         #zd_delete_main_target_shell
+
+        File.delete(zd_cache_file_path) if File.exist?(zd_cache_file_path)
     end
     
     def self.zabel_get_potential_hit_target_cache_dirs(target, target_md5, miss_dependency_list)
